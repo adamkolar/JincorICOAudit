@@ -18,8 +18,9 @@ One interesting aspect of the crowdsale is the decision to update the price of t
 
 ## 1. Referral bonus is counted towards reaching softcap/hardcap even if nobody receives it
 
-In the doPurchase function of JincorTokenICO contrct, value of referral bonus is obtained by calling calculateReferralBonus function and the tokensSold variable is incremented by this bonus, this happens whether someone actually receives the bonus or not. This means that these tokens are removed from the available tokens for sale even though no third party receives them.
+In the doPurchase function of JincorTokenICO contrct, value of referral bonus is obtained by calling calculateReferralBonus function and the tokensSold variable is incremented by this bonus, this happens whether someone actually receives the bonus or not. In case nobody is eleigible to receive the bonus, these tokens are effectively removed from the available tokens for sale and remain in the ownership of the crowdsale owner.
 
+###JincorTokenICO.sol / lines 214 - 247
 ```javascript  
 function doPurchase() private icoActive inNormalState {
     require(!crowdsaleFinished);
@@ -67,6 +68,7 @@ Check if buyer has a valid referral address before adding referralBonus to the n
 
 Because solidity rounds down during division, calculating jcrEthRate in this function:
 
+###JincorTokenICO.sol / lines 189 - 192
 ```javascript
   function receiveEthPrice(uint ethUsdPrice) external onlyEthPriceProvider {
     require(ethUsdPrice > 0);
@@ -101,6 +103,7 @@ If we care about precision, any calculation involving division should in general
 
 In doPurchase function of JincorTokenICO contract, this condition:
 
+###JincorTokenICO.sol / lines 226 - 229
 ```javascript
     if (!softCapReached && tokensSold < softCap && newTokensSold >= softCap) {
       softCapReached = true;
